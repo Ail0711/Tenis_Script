@@ -5,50 +5,19 @@ import requests
 st.set_page_config(page_title="Modelo Cuantitativo Tenis Pro", page_icon="🎾", layout="centered")
 
 # ==========================================
-# ESTILO CSS AVANZADO (Píldora flotante sin círculos)
+# ESTILO CSS PARA LAS PÍLDORAS DE NAVEGACIÓN
 # ==========================================
 st.markdown("""
     <style>
-    /* Ocultar los círculos de selección de los radio buttons */
-    .stRadio input[type="radio"] {
-        display: none;
-    }
-    
-    /* Contenedor general de la barra de opciones */
-    .stRadio > div {
+    /* Contenedor general estilo barra oscura */
+    .pill-container {
         background-color: #16181d;
-        padding: 5px;
+        padding: 6px;
         border-radius: 40px;
         display: flex;
-        justify-content: center;
         border: 1px solid #2d3139;
-        gap: 5px;
-    }
-    
-    /* Estilo base de cada opción (píldora inactiva) */
-    .stRadio label {
-        background-color: transparent;
-        color: #9ca3af !important;
-        padding: 8px 20px;
-        border-radius: 30px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin: 0px !important;
-    }
-    
-    /* Estilo cuando pasas el cursor por encima */
-    .stRadio label:hover {
-        color: #ffffff !important;
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-    
-    /* Estilo de la píldora ACTIVA (la que se ilumina con fondo) */
-    .stRadio label[data-checked="true"] {
-        background-color: #2b2f38 !important;
-        color: #ffffff !important;
-        font-weight: 600;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        gap: 6px;
+        margin-bottom: 20px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -57,18 +26,29 @@ st.title("🎾 Modelo Cuantitativo de Apuestas - Tenis")
 st.markdown("Herramienta analítica para el cálculo de *Dominance Ratio*, probabilidades de victoria y líneas de valor (+EV).")
 
 # ==========================================
-# MENÚ TIPO PÍLDORA MODERNA
+# GESTIÓN DE ESTADO PARA EL MENÚ PÍLDORA
 # ==========================================
+if 'modo_activo' not in st.session_state:
+    st.session_state.modo_activo = "api"
+
+# Creamos la barra visual contenedora
 st.write("")
-modo_operacion = st.radio(
-    "Modo de operación",
-    ["🤖 Usar API en vivo", "✍️ Introducir datos manualmente"],
-    horizontal=True,
-    label_visibility="collapsed"
-)
+col_menu1, col_menu2 = st.columns(2)
+
+# Usamos botones estilizados en columnas que simulan las pastillas
+with col_menu1:
+    tipo_btn_1 = "primary" if st.session_state.modo_activo == "api" else "secondary"
+    if st.button("🤖 Usar API en vivo", use_container_width=True, type=tipo_btn_1):
+        st.session_state.modo_activo = "api"
+        st.rerun()
+
+with col_menu2:
+    tipo_btn_2 = "primary" if st.session_state.modo_activo == "manual" else "secondary"
+    if st.button("✍️ Introducir datos manualmente", use_container_width=True, type=tipo_btn_2):
+        st.session_state.modo_activo = "manual"
+        st.rerun()
 
 st.divider()
-
 # Configuración general en la barra lateral
 API_KEY_DEF = "twjp_c1046afac84884ad567af80d1e77dab9"
 with st.sidebar:
