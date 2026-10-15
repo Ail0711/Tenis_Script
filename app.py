@@ -49,6 +49,7 @@ with col_menu2:
         st.rerun()
 
 st.divider()
+
 # Configuración general en la barra lateral
 API_KEY_DEF = "twjp_c1046afac84884ad567af80d1e77dab9"
 with st.sidebar:
@@ -60,7 +61,7 @@ with st.sidebar:
 # ==========================================
 # BLOQUE 1: USAR API EN VIVO
 # ==========================================
-if modo_operacion == "🤖 Usar API en vivo":
+if st.session_state.modo_activo == "api":
     st.subheader("📡 Búsqueda Automática por API")
     jugador_buscado = st.text_input("🔍 Buscar tenista por apellido (Ej: Zverev, Sakkari, Alcaraz):", "", key="input_api")
 
