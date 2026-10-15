@@ -22,7 +22,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🎾 Modelo Cuantitativo de Apuestas - Tenis")
+st.title("🎾 Modelo Matematico analitico de Apuestas - Tenis")
 st.markdown("Herramienta analítica para el cálculo de *Dominance Ratio*, probabilidades de victoria y líneas de valor (+EV).")
 
 # ==========================================
