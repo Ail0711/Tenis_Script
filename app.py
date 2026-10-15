@@ -4,16 +4,41 @@ import requests
 # Configuración de la página
 st.set_page_config(page_title="Modelo Cuantitativo Tenis Pro", page_icon="🎾", layout="centered")
 
+# ==========================================
+# ESTILO CSS PERSONALIZADO (Estilo Píldora / Pastilla)
+# ==========================================
+st.markdown("""
+    <style>
+    /* Estilo para los radio buttons o botones de selección en bloque tipo píldora */
+    .stRadio > div {
+        background-color: #1a1c23;
+        padding: 6px;
+        border-radius: 30px;
+        display: flex;
+        justify-content: center;
+        border: 1px solid #2d3139;
+    }
+    .stRadio label {
+        color: #a0aec0 !important;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 st.title("🎾 Modelo Cuantitativo de Apuestas - Tenis")
 st.markdown("Herramienta analítica para el cálculo de *Dominance Ratio*, probabilidades de victoria y líneas de valor (+EV).")
 
 # ==========================================
-# DISEÑO DE BLOQUES (PESTAÑAS) INTERACTIVOS
+# MENÚ TIPO PÍLDORA FLOTANTE
 # ==========================================
-tab_api, tab_manual = st.tabs([
-    "🤖  Usar API en vivo", 
-    "✍️  Introducir datos manualmente (Tennis Abstract)"
-])
+st.write("")
+modo_operacion = st.radio(
+    "Modo de operación",
+    ["🤖 Usar API en vivo", "✍️ Introducir datos manualmente"],
+    horizontal=True,
+    label_visibility="collapsed"
+)
 
 st.divider()
 
@@ -28,7 +53,7 @@ with st.sidebar:
 # ==========================================
 # BLOQUE 1: USAR API EN VIVO
 # ==========================================
-with tab_api:
+if modo_operacion == "🤖 Usar API en vivo":
     st.subheader("📡 Búsqueda Automática por API")
     jugador_buscado = st.text_input("🔍 Buscar tenista por apellido (Ej: Zverev, Sakkari, Alcaraz):", "", key="input_api")
 
@@ -125,7 +150,7 @@ with tab_api:
 # ==========================================
 # BLOQUE 2: INTRODUCIR DATOS MANUALMENTE
 # ==========================================
-with tab_manual:
+else:
     st.subheader("✍️ Auditoría Manual (Datos de Tennis Abstract)")
     
     col_j1, col_j2 = st.columns(2)
