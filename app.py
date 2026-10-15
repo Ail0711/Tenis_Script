@@ -80,14 +80,12 @@ if st.session_state.modo_activo == "api":
                         if not partido_encontrado:
                             st.info(f"🔍 No se encontró ningún partido próximo para '{jugador_buscado}' en la API. ¡Prueba a usar el modo manual!")
                         else:
-                            # Guardar en session_state para que persista al mover las líneas del casino
                             st.session_state.partido_data = partido_encontrado
                             st.session_state.sup_activa = superficie_seleccionada
                             
                 except Exception as e:
                     st.error(f"Ocurrió un error al procesar la API: {e}")
 
-    # Si ya hay un partido analizado en memoria, mostramos resultados y líneas del casino sin perdernos
     if 'partido_data' in st.session_state:
         match = st.session_state.partido_data
         p1_data = match['players']['p1']
@@ -100,7 +98,6 @@ if st.session_state.modo_activo == "api":
         nombre_2 = p2_data.get('name', 'Jugador 2')
         sup_sel = st.session_state.sup_activa
         
-        # Ajustes según superficie
         if "Clay" in sup_sel:
             hold_base = 76.0 if is_atp else 59.0
             break_base = 24.0 if is_atp else 39.0
@@ -162,34 +159,41 @@ if st.session_state.modo_activo == "api":
         mcol2.metric("Margen Proyectado", f"{margen_juegos_abs} juegos", f"A favor de {favorita}")
         mcol3.metric("Favorito Teórico", favorita)
         
-        # Comparativa de líneas con el casino
+        # Auditoría contra Casino
         st.divider()
         st.subheader("🎰 Auditoría contra Líneas del Casino (+EV)")
-        st.markdown("Ingresa las líneas que publica tu casa de apuestas (al modificarlas, el análisis se actualiza al instante sin reiniciar):")
+        st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
         
         ccol1, ccol2, ccol3 = st.columns(3)
         with ccol1:
             linea_casino_total = st.number_input("Línea Totales Casino (O/U)", min_value=12.5, max_value=45.5, value=float(linea_totales_justa), step=0.5, key="c_tot_api")
         with ccol2:
-            handicap_casino_fav = st.number_input(f"Hándicap Casino ({favorita})", min_value=-10.0, max_value=0.0, value=-3.5, step=0.5, key="c_fav_api")
+            handicap_casino_fav = st.number_input(f"Hándicap Casino ({favorita})", min_value=-15.0, max_value=0.0, value=-3.5, step=0.5, key="c_fav_api")
         with ccol3:
-            handicap_casino_dog = st.number_input(f"Hándicap Casino ({underdog})", min_value=0.0, max_value=10.0, value=3.5, step=0.5, key="c_dog_api")
+            handicap_casino_dog = st.number_input(f"Hándicap Casino ({underdog})", min_value=0.0, max_value=15.0, value=3.5, step=0.5, key="c_dog_api")
         
         st.markdown("---")
-        st.markdown("### 💡 Diagnóstico de Valor:")
+        st.markdown("### 💡 Diagnóstico de Valor Estricto:")
         
-        if linea_casino_total < linea_totales_justa - 1.0:
-            st.success(f"📈 **OVER Detectado:** El casino pide **{linea_casino_total}** juegos, pero tu modelo proyecta **{juegos_proyectados}**. Hay margen para buscar el **OVER**.")
-        elif linea_casino_total > linea_totales_justa + 1.0:
-            st.success(f"📉 **UNDER Detectado:** El casino pide **{linea_casino_total}** juegos, pero tu modelo proyecta **{juegos_proyectados}**. Hay margen para buscar el **UNDER**.")
+        # 1. Totales
+        if linea_casino_total < linea_totales_justa - 1.5:
+            st.success(f"📈 **OVER Detectado:** El casino ofrece una línea baja de **{linea_casino_total}**, mientras tu modelo proyecta **{juegos_proyectados}**. Hay margen sólido para el OVER.")
+        elif linea_casino_total > linea_totales_justa + 1.5:
+            st.success(f"📉 **UNDER Detectado:** El casino ofrece una línea alta de **{linea_casino_total}**, mientras tu modelo proyecta **{juegos_proyectados}**. Hay margen sólido para el UNDER.")
         else:
-            st.info(f"⚖️ **Totales alineados:** La línea del casino ({linea_casino_total}) está muy cerca de la justa del modelo ({linea_totales_justa}). Sin margen claro.")
+            st.info(f"⚖️ **Totales sin valor claro:** La línea del casino ({linea_casino_total}) está alineada con la justa del modelo ({linea_totales_justa}).")
             
+        # 2. Hándicap Favorito (Estricto: El hándicap del casino debe ser MENOR que el margen esperado del modelo)
         if abs(handicap_casino_fav) < (margen_juegos_abs - 1.5):
-            st.success(f"🔥 **Valor en el Favorito ({favorita}):** El casino ofrece un hándicap de `{handicap_casino_fav}`, pero tu modelo calcula un margen superior (`-{margen_juegos_abs}`). ¡Buen spot para ir con el favorito!")
-        
-        if handicap_casino_dog > (margen_juegos_abs - 1.5):
-            st.success(f"🐕 **Valor en el Underdog ({underdog}):** El casino te protege con un jugoso hándicap de `+{handicap_casino_dog}`, ofreciendo un margen de seguridad excelente frente a la diferencia real esperada.")
+            st.success(f"🔥 **Valor en el Favorito ({favorita}):** El casino te pide cubrir un hándicap de solo `{handicap_casino_fav}`, pero tu modelo espera un margen de `-{margen_juegos_abs}`. ¡Hay ventaja a favor del favorito!")
+        else:
+            st.info(f"🛡️ **Sin valor claro en el Favorito:** El hándicap del casino (`{handicap_casino_fav}`) es demasiado alto para el margen proyectado.")
+
+        # 3. Hándicap Underdog (Estricto: El hándicap positivo del casino debe ser MAYOR al margen esperado para que realmente sea un "regalo")
+        if handicap_casino_dog > (margen_juegos_abs + 1.5):
+            st.success(f"🐕 **Valor Real en el Underdog ({underdog}):** El casino te está regalando un hándicap de `+{handicap_casino_dog}`, cuando tu modelo proyecta que la diferencia real será menor (`{margen_juegos_abs}`). ¡Excelente valor en el perro!")
+        else:
+            st.info(f"🛡️ **Sin valor claro en el Underdog:** El hándicap `+{handicap_casino_dog}` del casino es ajustado y no supera con margen el hándicap real esperado.")
 
 # ==========================================
 # BLOQUE 2: INTRODUCIR DATOS MANUALMENTE
@@ -211,7 +215,6 @@ else:
         hold_2 = st.number_input("Hold% (SvcG W%) B", min_value=40.0, max_value=98.0, value=75.0, step=0.1, key="h2_man")
         break_2 = st.number_input("Break% (RetG W%) B", min_value=5.0, max_value=60.0, value=20.0, step=0.1, key="b2_man")
         
-    # Usamos session_state para guardar el cálculo manual y que no se borre al mover las líneas del casino
     if st.button("🧮 Calcular Modelo Manual", type="primary", key="btn_manual"):
         st.session_state.calculo_manual_hecho = True
         st.session_state.m_n1 = nombre_1
@@ -266,28 +269,32 @@ else:
         
         st.divider()
         st.subheader("🎰 Auditoría contra Líneas del Casino (+EV)")
-        st.markdown("Ingresa las líneas que publica tu casa de apuestas:")
+        st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
         
         ccol1, ccol2, ccol3 = st.columns(3)
         with ccol1:
             linea_casino_total = st.number_input("Línea Totales Casino (O/U)", min_value=12.5, max_value=45.5, value=float(linea_totales_justa), step=0.5, key="c_tot_man")
         with ccol2:
-            handicap_casino_fav = st.number_input(f"Hándicap Casino ({favorita})", min_value=-10.0, max_value=0.0, value=-3.5, step=0.5, key="c_fav_man")
+            handicap_casino_fav = st.number_input(f"Hándicap Casino ({favorita})", min_value=-15.0, max_value=0.0, value=-3.5, step=0.5, key="c_fav_man")
         with ccol3:
-            handicap_casino_dog = st.number_input(f"Hándicap Casino ({underdog})", min_value=0.0, max_value=10.0, value=3.5, step=0.5, key="c_dog_man")
+            handicap_casino_dog = st.number_input(f"Hándicap Casino ({underdog})", min_value=0.0, max_value=15.0, value=3.5, step=0.5, key="c_dog_man")
         
         st.markdown("---")
-        st.markdown("### 💡 Diagnóstico de Valor:")
+        st.markdown("### 💡 Diagnóstico de Valor Estricto:")
         
-        if linea_casino_total < linea_totales_justa - 1.0:
-            st.success(f"📈 **OVER Detectado:** El casino pide **{linea_casino_total}** juegos, pero tu modelo proyecta **{juegos_proyectados}**. Hay margen para buscar el **OVER**.")
-        elif linea_casino_total > linea_totales_justa + 1.0:
-            st.success(f"📉 **UNDER Detectado:** El casino pide **{linea_casino_total}** juegos, pero tu modelo proyecta **{juegos_proyectados}**. Hay margen para buscar el **UNDER**.")
+        if linea_casino_total < linea_totales_justa - 1.5:
+            st.success(f"📈 **OVER Detectado:** El casino ofrece una línea baja de **{linea_casino_total}**, mientras tu modelo proyecta **{juegos_proyectados}**. Hay margen sólido para el OVER.")
+        elif linea_casino_total > linea_totales_justa + 1.5:
+            st.success(f"📉 **UNDER Detectado:** El casino ofrece una línea alta de **{linea_casino_total}**, mientras tu modelo proyecta **{juegos_proyectados}**. Hay margen sólido para el UNDER.")
         else:
-            st.info(f"⚖️ **Totales alineados:** La línea del casino ({linea_casino_total}) está muy cerca de la justa del modelo ({linea_totales_justa}). Sin margen claro.")
+            st.info(f"⚖️ **Totales sin valor claro:** La línea del casino ({linea_casino_total}) está alineada con la justa del modelo ({linea_totales_justa}).")
             
         if abs(handicap_casino_fav) < (margen_juegos_abs - 1.5):
-            st.success(f"🔥 **Valor en el Favorito ({favorita}):** El casino ofrece un hándicap de `{handicap_casino_fav}`, pero tu modelo calcula un margen superior (`-{margen_juegos_abs}`). ¡Buen spot para ir con el favorito!")
-        
-        if handicap_casino_dog > (margen_juegos_abs - 1.5):
-            st.success(f"🐕 **Valor en el Underdog ({underdog}):** El casino te protege con un jugoso hándicap de `+{handicap_casino_dog}`, ofreciendo un margen de seguridad excelente frente a la diferencia real esperada.")
+            st.success(f"🔥 **Valor en el Favorito ({favorita}):** El casino te pide cubrir un hándicap de solo `{handicap_casino_fav}`, pero tu modelo espera un margen de `-{margen_juegos_abs}`. ¡Hay ventaja a favor del favorito!")
+        else:
+            st.info(f"🛡️ **Sin valor claro en el Favorito:** El hándicap del casino (`{handicap_casino_fav}`) es demasiado alto para el margen proyectado.")
+
+        if handicap_casino_dog > (margen_juegos_abs + 1.5):
+            st.success(f"🐕 **Valor Real en el Underdog ({underdog}):** El casino te está regalando un hándicap de `+{handicap_casino_dog}`, cuando tu modelo proyecta que la diferencia real será menor (`{margen_juegos_abs}`). ¡Excelente valor en el perro!")
+        else:
+            st.info(f"🛡️ **Sin valor claro en el Underdog:** El hándicap `+{handicap_casino_dog}` del casino es ajustado y no supera con margen el hándicap real esperado.")
