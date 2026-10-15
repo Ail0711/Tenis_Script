@@ -5,7 +5,7 @@ import requests
 st.set_page_config(page_title="Modelo Cuantitativo Tenis Pro", page_icon="🎾", layout="centered")
 
 # ==========================================
-# GESTIÓN DE ESTADO PARA EL MENÚ PÍLDORA (ROBUSTA)
+# GESTIÓN DE ESTADO
 # ==========================================
 if 'modo_activo' not in st.session_state:
     st.session_state.modo_activo = "api"
@@ -33,7 +33,9 @@ API_KEY_DEF = "twjp_c1046afac84884ad567af80d1e77dab9"
 with st.sidebar:
     st.header("⚙️ Configuración General")
     api_key_input = st.text_input("API Key de Live Tennis", value=API_KEY_DEF, type="password")
-    circuito = st.selectbox("Circuito Base", ["ATP (Masculino)", "WTA (Femenino)"])
+    
+    # Añadimos on_change o permitimos que Streamlit detecte el cambio de circuito
+    circuito = st.selectbox("Circuito Base", ["ATP (Masculino)", "WTA (Femenino)"], key="circuito_select")
     is_atp = "ATP" in circuito
 
 # ==========================================
@@ -86,6 +88,7 @@ if st.session_state.modo_activo == "api":
                 except Exception as e:
                     st.error(f"Ocurrió un error al procesar la API: {e}")
 
+    # Si hay partido en memoria, recalculamos SIEMPRE usando el valor actual de is_atp y sup_sel
     if 'partido_data' in st.session_state:
         match = st.session_state.partido_data
         p1_data = match['players']['p1']
@@ -98,6 +101,7 @@ if st.session_state.modo_activo == "api":
         nombre_2 = p2_data.get('name', 'Jugador 2')
         sup_sel = st.session_state.sup_activa
         
+        # Ajustes dinámicos según el circuito (is_atp) y la superficie seleccionada
         if "Clay" in sup_sel:
             hold_base = 76.0 if is_atp else 59.0
             break_base = 24.0 if is_atp else 39.0
@@ -143,7 +147,7 @@ if st.session_state.modo_activo == "api":
         favorita = nombre_1 if diff_dr >= 0 else nombre_2
         underdog = nombre_2 if diff_dr >= 0 else nombre_1
         
-        st.success(f"🏆 Torneo: **{torneo}** | Pista: **{sup_sel}**")
+        st.success(f"🏆 Torneo: **{torneo}** | Circuito: **{'ATP' if is_atp else 'WTA'}** | Pista: **{sup_sel}**")
         col1, col2 = st.columns(2)
         with col1:
             st.metric(label=f"⚔️ {nombre_1} (Rank {r1})", value=f"{prob_1}% Prob.", delta=f"DR: {dr_1}")
@@ -161,7 +165,7 @@ if st.session_state.modo_activo == "api":
         
         # Auditoría contra Casino
         st.divider()
-        st.subheader("🎰 Busqueda de valor contra Líneas del Casino (+EV)")
+        st.subheader("🎰 Auditoría contra Líneas del Casino (+EV)")
         st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
         
         ccol1, ccol2, ccol3 = st.columns(3)
@@ -175,7 +179,6 @@ if st.session_state.modo_activo == "api":
         st.markdown("---")
         st.markdown("### 💡 Diagnóstico de Valor Estricto:")
         
-        # 1. Totales
         if linea_casino_total < linea_totales_justa - 1.5:
             st.success(f"📈 **OVER Detectado:** El casino ofrece una línea baja de **{linea_casino_total}**, mientras tu modelo proyecta **{juegos_proyectados}**. Hay margen sólido para el OVER.")
         elif linea_casino_total > linea_totales_justa + 1.5:
@@ -183,13 +186,11 @@ if st.session_state.modo_activo == "api":
         else:
             st.info(f"⚖️ **Totales sin valor claro:** La línea del casino ({linea_casino_total}) está alineada con la justa del modelo ({linea_totales_justa}).")
             
-        # 2. Hándicap Favorito (Estricto: El hándicap del casino debe ser MENOR que el margen esperado del modelo)
         if abs(handicap_casino_fav) < (margen_juegos_abs - 1.5):
             st.success(f"🔥 **Valor en el Favorito ({favorita}):** El casino te pide cubrir un hándicap de solo `{handicap_casino_fav}`, pero tu modelo espera un margen de `-{margen_juegos_abs}`. ¡Hay ventaja a favor del favorito!")
         else:
             st.info(f"🛡️ **Sin valor claro en el Favorito:** El hándicap del casino (`{handicap_casino_fav}`) es demasiado alto para el margen proyectado.")
 
-        # 3. Hándicap Underdog (Estricto: El hándicap positivo del casino debe ser MAYOR al margen esperado para que realmente sea un "regalo")
         if handicap_casino_dog > (margen_juegos_abs + 1.5):
             st.success(f"🐕 **Valor Real en el Underdog ({underdog}):** El casino te está regalando un hándicap de `+{handicap_casino_dog}`, cuando tu modelo proyecta que la diferencia real será menor (`{margen_juegos_abs}`). ¡Excelente valor en el perro!")
         else:
@@ -268,7 +269,7 @@ else:
         mcol3.metric("Favorito Teórico", favorita)
         
         st.divider()
-        st.subheader("🎰 Busqueda de valor contra Líneas del Casino (+EV)")
+        st.subheader("🎰 Auditoría contra Líneas del Casino (+EV)")
         st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
         
         ccol1, ccol2, ccol3 = st.columns(3)
@@ -295,6 +296,6 @@ else:
             st.info(f"🛡️ **Sin valor claro en el Favorito:** El hándicap del casino (`{handicap_casino_fav}`) es demasiado alto para el margen proyectado.")
 
         if handicap_casino_dog > (margen_juegos_abs + 1.5):
-            st.success(f"🐕 **Valor Real en el Underdog ({underdog}):** El casino te está regalando un hándicap de `+{handicap_casino_dog}`, cuando tu modelo proyecta que la diferencia real será menor (`{margen_juegos_abs}`). ¡Excelente valor en el underdog!")
+            st.success(f"🐕 **Valor Real en el Underdog ({underdog}):** El casino te está regalando un hándicap de `+{handicap_casino_dog}`, cuando tu modelo proyecta que la diferencia real será menor (`{margen_juegos_abs}`). ¡Excelente valor en el perro!")
         else:
             st.info(f"🛡️ **Sin valor claro en el Underdog:** El hándicap `+{handicap_casino_dog}` del casino es ajustado y no supera con margen el hándicap real esperado.")
