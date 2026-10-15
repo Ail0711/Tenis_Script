@@ -9,7 +9,6 @@ st.set_page_config(page_title="Modelo Cuantitativo Tenis Pro", page_icon="🎾",
 # ==========================================
 st.markdown("""
     <style>
-    /* Contenedor general estilo barra oscura */
     .pill-container {
         background-color: #16181d;
         padding: 6px;
@@ -22,7 +21,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🎾 Modelo Matematico analitico de Apuestas - Tenis")
+st.title("🎾 Modelo Matemático analitico de Apuestas - Tenis")
 st.markdown("Herramienta analítica para el cálculo de *Dominance Ratio*, probabilidades de victoria y líneas de valor (+EV).")
 
 # ==========================================
@@ -31,11 +30,9 @@ st.markdown("Herramienta analítica para el cálculo de *Dominance Ratio*, proba
 if 'modo_activo' not in st.session_state:
     st.session_state.modo_activo = "api"
 
-# Creamos la barra visual contenedora
 st.write("")
 col_menu1, col_menu2 = st.columns(2)
 
-# Usamos botones estilizados en columnas que simulan las pastillas
 with col_menu1:
     tipo_btn_1 = "primary" if st.session_state.modo_activo == "api" else "secondary"
     if st.button("🤖 Usar API en vivo", use_container_width=True, type=tipo_btn_1):
@@ -63,7 +60,17 @@ with st.sidebar:
 # ==========================================
 if st.session_state.modo_activo == "api":
     st.subheader("📡 Búsqueda Automática por API")
-    jugador_buscado = st.text_input("🔍 Buscar tenista por apellido (Ej: Zverev, Sakkari, Alcaraz):", "", key="input_api")
+    
+    # Campo de búsqueda y selector de superficie en la misma sección
+    col_s1, col_s2 = st.columns([2, 1])
+    with col_s1:
+        jugador_buscado = st.text_input("🔍 Buscar tenista por apellido (Ej: Zverev, Sakkari, Alcaraz):", "", key="input_api")
+    with col_s2:
+        superficie_seleccionada = st.selectbox(
+            "🌍 Superficie / Pista", 
+            ["Hard (Dura)", "Clay (Arcilla)", "Grass (Hierba)", "Indoor Hard (Dura Tech)"],
+            key="sup_api"
+        )
 
     if st.button("🚀 Analizar desde API", type="primary", key="btn_api"):
         if not jugador_buscado.strip():
@@ -96,21 +103,34 @@ if st.session_state.modo_activo == "api":
                             p1_data = partido_encontrado['players']['p1']
                             p2_data = partido_encontrado['players']['p2']
                             torneo = partido_encontrado.get('tournament', 'Torneo Oficial')
-                            superficie = partido_encontrado.get('surface', 'hard').upper()
                             
                             r1 = p1_data.get('ranking') or p1_data.get('itf_ranking') or 100
                             r2 = p2_data.get('ranking') or p2_data.get('itf_ranking') or 100
                             nombre_1 = p1_data.get('name', 'Jugador 1')
                             nombre_2 = p2_data.get('name', 'Jugador 2')
                             
-                            hold_base = 78.0 if is_atp else 62.0
-                            break_base = 22.0 if is_atp else 36.0
-                            base_juegos = 22.5 if is_atp else 21.5
+                            # Ajustes de bases según superficie seleccionada
+                            if "Clay" in superficie_seleccionada:
+                                hold_base = 76.0 if is_atp else 59.0
+                                break_base = 24.0 if is_atp else 39.0
+                                base_juegos = 22.0 if is_atp else 21.0
+                            elif "Grass" in superficie_seleccionada:
+                                hold_base = 82.0 if is_atp else 66.0
+                                break_base = 18.0 if is_atp else 32.0
+                                base_juegos = 23.0 if is_atp else 22.0
+                            elif "Indoor" in superficie_seleccionada:
+                                hold_base = 81.0 if is_atp else 64.0
+                                break_base = 19.0 if is_atp else 34.0
+                                base_juegos = 23.0 if is_atp else 22.0
+                            else:  # Hard por defecto
+                                hold_base = 78.0 if is_atp else 62.0
+                                break_base = 22.0 if is_atp else 36.0
+                                base_juegos = 22.5 if is_atp else 21.5
                             
                             factor_r1 = max(0, (100 - r1) * 0.15)
                             factor_r2 = max(0, (100 - r2) * 0.15)
                             
-                            limite_hold = 92.0 if is_atp else 85.0
+                            limite_hold = 93.0 if is_atp else 86.0
                             hold_1 = round(min(limite_hold, hold_base + (factor_r1 * 0.4)), 1)
                             break_1 = round(min(45.0, break_base + (factor_r1 * 0.3)), 1)
                             dr_1 = round(hold_1 / (100 - break_1), 2) if (100 - break_1) > 0 else 1.0
@@ -124,7 +144,8 @@ if st.session_state.modo_activo == "api":
                             prob_1 = round((dr_1 / (dr_1 + dr_2)) * 100, 1)
                             prob_2 = round(100 - prob_1, 1)
                             
-                            desviacion_hold = hold_sum - (156.0 if is_atp else 120.0)
+                            suma_esperada_hold = (hold_base * 2)
+                            desviacion_hold = hold_sum - suma_esperada_hold
                             juegos_proyectados = round(base_juegos - (desviacion_hold * 0.15), 1)
                             linea_totales_justa = round(juegos_proyectados * 2) / 2
                             margen_juegos_abs = round(abs(diff_dr) * (12.5 if is_atp else 11.0), 1)
@@ -132,7 +153,7 @@ if st.session_state.modo_activo == "api":
                             favorita = nombre_1 if diff_dr >= 0 else nombre_2
                             underdog = nombre_2 if diff_dr >= 0 else nombre_1
                             
-                            st.success(f"🏆 Torneo: **{torneo}** | Superficie: **{superficie}**")
+                            st.success(f"🏆 Torneo: **{torneo}** | Pista: **{superficie_seleccionada}**")
                             col1, col2 = st.columns(2)
                             with col1:
                                 st.metric(label=f"⚔️ {nombre_1} (Rank {r1})", value=f"{prob_1}% Prob.", delta=f"DR: {dr_1}")
