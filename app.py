@@ -5,23 +5,50 @@ import requests
 st.set_page_config(page_title="Modelo Cuantitativo Tenis Pro", page_icon="🎾", layout="centered")
 
 # ==========================================
-# ESTILO CSS PERSONALIZADO (Estilo Píldora / Pastilla)
+# ESTILO CSS AVANZADO (Píldora flotante sin círculos)
 # ==========================================
 st.markdown("""
     <style>
-    /* Estilo para los radio buttons o botones de selección en bloque tipo píldora */
+    /* Ocultar los círculos de selección de los radio buttons */
+    .stRadio input[type="radio"] {
+        display: none;
+    }
+    
+    /* Contenedor general de la barra de opciones */
     .stRadio > div {
-        background-color: #1a1c23;
-        padding: 6px;
-        border-radius: 30px;
+        background-color: #16181d;
+        padding: 5px;
+        border-radius: 40px;
         display: flex;
         justify-content: center;
         border: 1px solid #2d3139;
+        gap: 5px;
     }
+    
+    /* Estilo base de cada opción (píldora inactiva) */
     .stRadio label {
-        color: #a0aec0 !important;
-        font-weight: 600;
+        background-color: transparent;
+        color: #9ca3af !important;
+        padding: 8px 20px;
+        border-radius: 30px;
+        font-weight: 500;
         cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 0px !important;
+    }
+    
+    /* Estilo cuando pasas el cursor por encima */
+    .stRadio label:hover {
+        color: #ffffff !important;
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Estilo de la píldora ACTIVA (la que se ilumina con fondo) */
+    .stRadio label[data-checked="true"] {
+        background-color: #2b2f38 !important;
+        color: #ffffff !important;
+        font-weight: 600;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -30,7 +57,7 @@ st.title("🎾 Modelo Cuantitativo de Apuestas - Tenis")
 st.markdown("Herramienta analítica para el cálculo de *Dominance Ratio*, probabilidades de victoria y líneas de valor (+EV).")
 
 # ==========================================
-# MENÚ TIPO PÍLDORA FLOTANTE
+# MENÚ TIPO PÍLDORA MODERNA
 # ==========================================
 st.write("")
 modo_operacion = st.radio(
