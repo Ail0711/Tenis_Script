@@ -8,13 +8,12 @@ st.title("🎾 Modelo Cuantitativo de Apuestas - Tenis")
 st.markdown("Herramienta analítica para el cálculo de *Dominance Ratio*, probabilidades de victoria y líneas de valor (+EV).")
 
 # ==========================================
-# SELECCIÓN DE MODO EN LA PARTE SUPERIOR
+# DISEÑO DE BLOQUES (PESTAÑAS) INTERACTIVOS
 # ==========================================
-modo_operacion = st.radio(
-    "Selecciona el método de entrada de datos:",
-    ["🤖 Usar API en vivo", "✍️ Introducir datos manualmente (Tennis Abstract)"],
-    horizontal=True
-)
+tab_api, tab_manual = st.tabs([
+    "🤖  Usar API en vivo", 
+    "✍️  Introducir datos manualmente (Tennis Abstract)"
+])
 
 st.divider()
 
@@ -27,13 +26,13 @@ with st.sidebar:
     is_atp = "ATP" in circuito
 
 # ==========================================
-# MODO 1: USAR API EN VIVO
+# BLOQUE 1: USAR API EN VIVO
 # ==========================================
-if modo_operacion == "🤖 Usar API en vivo":
+with tab_api:
     st.subheader("📡 Búsqueda Automática por API")
-    jugador_buscado = st.text_input("🔍 Buscar tenista por apellido (Ej: Zverev, Sakkari, Alcaraz):", "")
+    jugador_buscado = st.text_input("🔍 Buscar tenista por apellido (Ej: Zverev, Sakkari, Alcaraz):", "", key="input_api")
 
-    if st.button("🚀 Analizar desde API", type="primary"):
+    if st.button("🚀 Analizar desde API", type="primary", key="btn_api"):
         if not jugador_buscado.strip():
             st.warning("⚠️ Por favor ingresa el nombre o apellido de un tenista.")
         else:
@@ -87,7 +86,6 @@ if modo_operacion == "🤖 Usar API en vivo":
                             break_2 = round(min(45.0, break_base + (factor_r2 * 0.3)), 1)
                             dr_2 = round(hold_2 / (100 - break_2), 2) if (100 - break_2) > 0 else 1.0
                             
-                            # Motor de cálculo compartido
                             diff_dr = round(dr_1 - dr_2, 2)
                             hold_sum = round(hold_1 + hold_2, 1)
                             prob_1 = round((dr_1 / (dr_1 + dr_2)) * 100, 1)
@@ -101,7 +99,6 @@ if modo_operacion == "🤖 Usar API en vivo":
                             favorita = nombre_1 if diff_dr >= 0 else nombre_2
                             underdog = nombre_2 if diff_dr >= 0 else nombre_1
                             
-                            # Visualización de resultados
                             st.success(f"🏆 Torneo: **{torneo}** | Superficie: **{superficie}**")
                             col1, col2 = st.columns(2)
                             with col1:
@@ -126,27 +123,26 @@ if modo_operacion == "🤖 Usar API en vivo":
                     st.error(f"Ocurrió un error al procesar la API: {e}")
 
 # ==========================================
-# MODO 2: INTRODUCIR DATOS MANUALMENTE
+# BLOQUE 2: INTRODUCIR DATOS MANUALMENTE
 # ==========================================
-else:
-    st.subheader("✍️ Auditoría Manual (Datos de Tennis Abstract / ITF / Previas)")
+with tab_manual:
+    st.subheader("✍️ Auditoría Manual (Datos de Tennis Abstract)")
     
     col_j1, col_j2 = st.columns(2)
     
     with col_j1:
         st.markdown("### Jugador / Tenista A")
-        nombre_1 = st.text_input("Nombre Tenista A", "Jugador 1")
-        hold_1 = st.number_input("Hold% (SvcG W%) A", min_value=40.0, max_value=98.0, value=78.0, step=0.1)
-        break_1 = st.number_input("Break% (RetG W%) A", min_value=5.0, max_value=60.0, value=22.0, step=0.1)
+        nombre_1 = st.text_input("Nombre Tenista A", "Jugador 1", key="n1_man")
+        hold_1 = st.number_input("Hold% (SvcG W%) A", min_value=40.0, max_value=98.0, value=78.0, step=0.1, key="h1_man")
+        break_1 = st.number_input("Break% (RetG W%) A", min_value=5.0, max_value=60.0, value=22.0, step=0.1, key="b1_man")
         
     with col_j2:
         st.markdown("### Jugador / Tenista B")
-        nombre_2 = st.text_input("Nombre Tenista B", "Jugador 2")
-        hold_2 = st.number_input("Hold% (SvcG W%) B", min_value=40.0, max_value=98.0, value=75.0, step=0.1)
-        break_2 = st.number_input("Break% (RetG W%) B", min_value=5.0, max_value=60.0, value=20.0, step=0.1)
+        nombre_2 = st.text_input("Nombre Tenista B", "Jugador 2", key="n2_man")
+        hold_2 = st.number_input("Hold% (SvcG W%) B", min_value=40.0, max_value=98.0, value=75.0, step=0.1, key="h2_man")
+        break_2 = st.number_input("Break% (RetG W%) B", min_value=5.0, max_value=60.0, value=20.0, step=0.1, key="b2_man")
         
-    if st.button("🧮 Calcular Modelo Manual", type="primary"):
-        # Cálculo de Dominance Ratio manual
+    if st.button("🧮 Calcular Modelo Manual", type="primary", key="btn_manual"):
         dr_1 = round(hold_1 / (100 - break_1), 2) if (100 - break_1) > 0 else 1.0
         dr_2 = round(hold_2 / (100 - break_2), 2) if (100 - break_2) > 0 else 1.0
         
