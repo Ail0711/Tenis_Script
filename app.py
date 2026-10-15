@@ -161,7 +161,7 @@ if st.session_state.modo_activo == "api":
         
         # Auditoría contra Casino
         st.divider()
-        st.subheader("🎰 Auditoría contra Líneas del Casino (+EV)")
+        st.subheader("🎰 Busqueda de valor contra Líneas del Casino (+EV)")
         st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
         
         ccol1, ccol2, ccol3 = st.columns(3)
