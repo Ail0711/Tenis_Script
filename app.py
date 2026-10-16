@@ -70,11 +70,13 @@ with st.sidebar:
                     if "wta" in tour_info or "itf" in tour_info:
                         partidos_filtrados.append(p)
 
-                        
+
             if partidos_filtrados:
                 for partido in partidos_filtrados[:10]:
-                    jugador_1 = partido.get("player_1", "Jugador A")
-                    jugador_2 = partido.get("player_2", "Jugador B")
+                    # Probamos diferentes alternativas comunes de nombres de llaves en APIs de tenis
+                    jugador_1 = partido.get("player_1") or partido.get("home_player") or partido.get("player1") or partido.get("name_1") or "Jugador A"
+                    jugador_2 = partido.get("player_2") or partido.get("away_player") or partido.get("player2") or partido.get("name_2") or "Jugador B"
+                    
                     st.markdown(f"• **{jugador_1}** vs **{jugador_2}**")
             else:
                 st.info(f"No hay partidos para el circuito seleccionado en este momento.")
