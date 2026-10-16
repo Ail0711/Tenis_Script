@@ -72,12 +72,15 @@ with st.sidebar:
 
 
             if partidos_filtrados:
+                # TRUCO DE DIAGNÓSTICO: Mostramos las llaves exactas del diccionario del primer partido
+                primer_partido = partidos_filtrados[0]
+                st.write("Llaves disponibles en la API:", list(primer_partido.keys()))
+                
                 for partido in partidos_filtrados[:10]:
-                    # Probamos diferentes alternativas comunes de nombres de llaves en APIs de tenis
-                    jugador_1 = partido.get("player_1") or partido.get("home_player") or partido.get("player1") or partido.get("name_1") or "Jugador A"
-                    jugador_2 = partido.get("player_2") or partido.get("away_player") or partido.get("player2") or partido.get("name_2") or "Jugador B"
-                    
+                    jugador_1 = partido.get("player_1", "Jugador A")
+                    jugador_2 = partido.get("player_2", "Jugador B")
                     st.markdown(f"• **{jugador_1}** vs **{jugador_2}**")
+                    
             else:
                 st.info(f"No hay partidos para el circuito seleccionado en este momento.")
         else:
