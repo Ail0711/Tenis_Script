@@ -77,28 +77,44 @@ with st.sidebar:
 
 
             if partidos_filtrados:
-                # Inspeccionamos la categoría (tier) del torneo en la API
-                primer_partido = partidos_filtrados[0]
-                tier_torneo = primer_partido.get("tier", "No especificado")
-                torneo_nombre = primer_partido.get("tournament", "No especificado")
-                
-                st.caption(f"Torneo de ejemplo: {torneo_nombre} | Tier: {tier_torneo}")
-                
                 for partido in partidos_filtrados[:10]:
                     players = partido.get("players", {})
+                    
                     if isinstance(players, dict):
                         p1 = players.get("p1", {})
                         p2 = players.get("p2", {})
+                        
                         jugador_1 = p1.get("name", "Jugador A") if isinstance(p1, dict) else "Jugador A"
                         jugador_2 = p2.get("name", "Jugador B") if isinstance(p2, dict) else "Jugador B"
                     else:
                         jugador_1 = "Jugador A"
                         jugador_2 = "Jugador B"
+                    
+                    # Extraemos superficie, hora y pista
+                    superficie = str(partido.get("surface", "N/D")).capitalize()
+                    court = partido.get("court", "")
+                    raw_time = partido.get("scheduled_time", "")
+                    
+                    # Recortamos la hora (HH:MM)
+                    hora_str = ""
+                    if raw_time and "T" in raw_time:
+                        hora_str = raw_time.split("T")[1][:5]
+                    
+                    # Armamos el detalle con la superficie al frente para el análisis
+                    detalles = []
+                    if superficie:
+                        detalles.append(superficie)
+                    if hora_str:
+                        detalles.append(hora_str)
+                    if court:
+                        detalles.append(court)
                         
-                    st.markdown(f"• **{jugador_1}** vs **{jugador_2}**")
-
+                    info_extra = " | ".join(detalles)
+                    
+                    st.markdown(f"• **{jugador_1}** vs **{jugador_2}**\n  <small style='color: gray;'>({info_extra})</small>", unsafe_allow_html=True)
             else:
-                st.info(f"No hay partidos para el circuito seleccionado en este momento.")
+                st.info("No hay partidos individuales del circuito principal en este momento.")
+
         else:
             st.warning("No se pudieron cargar los partidos.")
             
