@@ -56,18 +56,22 @@ with st.sidebar:
                 ejemplo_tour = lista_partidos[0].get('tour', 'No especificado')
                 st.caption(f"Ejemplo de tour: {ejemplo_tour}")
             
-            # Filtro adaptado a las etiquetas reales que devuelve la API (en minúsculas)
+            # Filtro estricto: Solo circuito principal (excluyendo Challengers e ITFs)
             partidos_filtrados = []
             for p in lista_partidos:
                 tour_info = str(p.get("tour", "")).lower()
+                tier_info = str(p.get("tier", "")).lower()
                 
+                # Descartamos todo lo que sea Challenger o ITF
+                if "challenger" in tour_info or "challenger" in tier_info or "itf" in tour_info or "itf" in tier_info:
+                    continue
+                
+                # Seleccionamos solo los del circuito principal según la opción elegida
                 if is_atp:
-                    # Incluye torneos ATP, Challengers y los ITF masculinos
-                    if "atp" in tour_info or "challenger" in tour_info or "itf" in tour_info:
+                    if "atp" in tour_info or "atp" in tier_info or "grand_slam" in tier_info:
                         partidos_filtrados.append(p)
                 else:
-                    # Incluye torneos WTA y los ITF femeninos
-                    if "wta" in tour_info or "itf" in tour_info:
+                    if "wta" in tour_info or "wta" in tier_info or "grand_slam" in tier_info:
                         partidos_filtrados.append(p)
 
 
