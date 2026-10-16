@@ -72,15 +72,23 @@ with st.sidebar:
 
 
             if partidos_filtrados:
-                # TRUCO DE DIAGNÓSTICO: Mostramos las llaves exactas del diccionario del primer partido
-                primer_partido = partidos_filtrados[0]
-                st.write("Llaves disponibles en la API:", list(primer_partido.keys()))
-                
                 for partido in partidos_filtrados[:10]:
-                    jugador_1 = partido.get("player_1", "Jugador A")
-                    jugador_2 = partido.get("player_2", "Jugador B")
-                    st.markdown(f"• **{jugador_1}** vs **{jugador_2}**")
+                    players = partido.get("players", [])
                     
+                    # Verificamos que existan al menos dos jugadores en la lista
+                    if isinstance(players, list) and len(players) >= 2:
+                        # Dependiendo de cómo vengan, pueden ser diccionarios con una clave de nombre o strings directos
+                        p1 = players[0]
+                        p2 = players[1]
+                        
+                        jugador_1 = p1.get("name", str(p1)) if isinstance(p1, dict) else str(p1)
+                        jugador_2 = p2.get("name", str(p2)) if isinstance(p2, dict) else str(p2)
+                    else:
+                        jugador_1 = "Jugador A"
+                        jugador_2 = "Jugador B"
+                        
+                    st.markdown(f"• **{jugador_1}** vs **{jugador_2}**")
+
             else:
                 st.info(f"No hay partidos para el circuito seleccionado en este momento.")
         else:
