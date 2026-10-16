@@ -2,6 +2,27 @@ import streamlit as st
 import requests
 from datetime import datetime, timezone, timedelta
 
+# ==========================================
+# FUNCIÓN DE CACHÉ (Pégalo arriba de todo)
+# ==========================================
+@st.cache_data(ttl=600, show_spinner="Consultando Live Tennis API...")
+def obtener_partidos_api(api_key):
+    url_partidos = "https://api.livetennisapi.com/api/public/v1/matches?status=upcoming"
+    headers = {
+        'x-api-key': api_key,
+        'content-type': 'application/json'
+    }
+    try:
+        response = requests.get(url_partidos, headers=headers)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            st.error(f"Error de conexión con la API (Código: {response.status_code})")
+            return {} 
+    except Exception as e:
+        st.error(f"Error al intentar conectar: {e}")
+        return {}
+
 # Configuración de la página
 st.set_page_config(page_title="Modelo Cuantitativo Tenis Pro", page_icon="🎾", layout="centered")
 
@@ -42,13 +63,20 @@ with st.sidebar:
     st.subheader("Partidos del día")
     
     try:
-        headers = {"x-api-key": API_KEY_DEF, "Content-Type": "application/json"}
-        url_partidos = "https://api.livetennisapi.com/api/public/v1/matches?status=upcoming"
-        response = requests.get(url_partidos, headers=headers)
         
-        if response.status_code == 200:
-            lista_partidos = response.json().get('data', [])
-            
+        if API_KEY_DEF:
+            datos_api = obtener_partidos_api(API_KEY_DEF)
+            lista_partidos = datos_api.get('data', [])
+        else:
+            st.warning("No se encontró la llave de la API en los secretos.")
+            lista_partidos = []
+        
+        if lista_partidos:
+            st.caption(f"Total partidos en API: {len(lista_partidos)}")
+            ejemplo_tour = lista_partidos[0].get('tour', 'No especificado')
+            st.caption(f"Ejemplo de tour: {ejemplo_tour}")
+
+
             # --- LÍNEA DE DIAGNÓSTICO TEMPORAL ---
             # Esto te mostrará en la app cuántos partidos totales trajo la API y un ejemplo del circuito
             if lista_partidos:
