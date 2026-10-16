@@ -29,7 +29,7 @@ with col_menu2:
 st.divider()
 
 # Configuración general en la barra lateral
-API_KEY_DEF = "twjp_c1046afac84884ad567af80d1e77dab9"
+API_KEY_DEF = st.secrets.get("LIVE_TENNIS_API_KEY", "")
 with st.sidebar:
     st.header("⚙️ Configuración General")
     api_key_input = st.text_input("API Key de Live Tennis", value=API_KEY_DEF, type="password")
