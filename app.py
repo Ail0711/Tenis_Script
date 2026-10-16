@@ -37,6 +37,27 @@ with st.sidebar:
     circuito = st.selectbox("Circuito Base", ["ATP (Masculino)", "WTA (Femenino)"], key="circuito_select")
     is_atp = "ATP" in circuito
 
+    st.markdown("---")
+    st.subheader("Partidos del día")
+    
+    try:
+        # Filtramos los partidos según el circuito seleccionado (ATP o WTA)
+        partidos_filtrados = [
+            p for p in lista_partidos 
+            if (is_atp and "ATP" in p.get("tour", "")) or (not is_atp and "WTA" in p.get("tour", ""))
+        ]
+        
+        if partidos_filtrados:
+            for partido in partidos_filtrados[:10]: # Mostramos los primeros 10 para mantener la barra limpia
+                jugador_1 = partido.get("player_1", "Jugador A")
+                jugador_2 = partido.get("player_2", "Jugador B")
+                st.markdown(f"• **{jugador_1}** vs **{jugador_2}**")
+        else:
+            st.info("No hay partidos próximos en este rango para el circuito seleccionado.")
+            
+    except Exception:
+        st.write("Cargando cartelera de encuentros...")
+
 # ==========================================
 # BLOQUE 1: USAR API EN VIVO
 # ==========================================
