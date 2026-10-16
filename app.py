@@ -41,7 +41,6 @@ with st.sidebar:
     st.subheader("Partidos del día")
     
     try:
-        # Hacemos la petición a la API para asegurar que 'lista_partidos' exista localmente
         headers = {"x-api-key": API_KEY_DEF, "Content-Type": "application/json"}
         url_partidos = "https://api.livetennisapi.com/api/public/v1/matches?status=upcoming"
         response = requests.get(url_partidos, headers=headers)
@@ -49,11 +48,23 @@ with st.sidebar:
         if response.status_code == 200:
             lista_partidos = response.json().get('data', [])
             
-            # Filtramos los partidos según el circuito seleccionado (ATP o WTA)
-            partidos_filtrados = [
-                p for p in lista_partidos 
-                if (is_atp and "ATP" in p.get("tour", "")) or (not is_atp and "WTA" in p.get("tour", ""))
-            ]
+            # --- LÍNEA DE DIAGNÓSTICO TEMPORAL ---
+            # Esto te mostrará en la app cuántos partidos totales trajo la API y un ejemplo del circuito
+            if lista_partidos:
+                st.caption(f"Total partidos en API: {len(lista_partidos)}")
+                # Mostramos de ejemplo cómo viene el torneo del primer partido
+                ejemplo_tour = lista_partidos[0].get('tour', 'No especificado')
+                st.caption(f"Ejemplo de tour: {ejemplo_tour}")
+            
+            # Filtro flexible adaptado
+            partidos_filtrados = []
+            for p in lista_partidos:
+                tour_info = str(p.get("tour", "")).upper()
+                # Verificamos de forma más amplia según la selección
+                if is_atp and ("ATP" in tour_info or "MEN" in tour_info or "MALE" in tour_info):
+                    partidos_filtrados.append(p)
+                elif not is_atp and ("WTA" in tour_info or "WOMEN" in tour_info or "FEM" in tour_info):
+                    partidos_filtrados.append(p)
             
             if partidos_filtrados:
                 for partido in partidos_filtrados[:10]:
@@ -61,12 +72,15 @@ with st.sidebar:
                     jugador_2 = partido.get("player_2", "Jugador B")
                     st.markdown(f"• **{jugador_1}** vs **{jugador_2}**")
             else:
-                st.info("No hay partidos próximos en este rango para el circuito seleccionado.")
+                st.info(f"No hay partidos para el circuito seleccionado en este momento.")
         else:
-            st.warning("No se pudieron cargar los partidos en este momento.")
+            st.warning("No se pudieron cargar los partidos.")
             
-    except Exception:
+    except Exception as e:
         st.write("Cargando cartelera de encuentros...")
+
+
+        
 # ==========================================
 # BLOQUE 1: USAR API EN VIVO
 # ==========================================
