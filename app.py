@@ -72,17 +72,20 @@ with st.sidebar:
 
 
             if partidos_filtrados:
+                # Mostramos la estructura exacta del primer jugador para inspeccionarlo
+                primer_partido = partidos_filtrados[0]
+                players_prueba = primer_partido.get("players", [])
+                st.write("Estructura del primer player:", players_prueba[0] if players_prueba else "Vacío")
+                
                 for partido in partidos_filtrados[:10]:
                     players = partido.get("players", [])
                     
-                    # Verificamos que existan al menos dos jugadores en la lista
                     if isinstance(players, list) and len(players) >= 2:
-                        # Dependiendo de cómo vengan, pueden ser diccionarios con una clave de nombre o strings directos
                         p1 = players[0]
                         p2 = players[1]
                         
-                        jugador_1 = p1.get("name", str(p1)) if isinstance(p1, dict) else str(p1)
-                        jugador_2 = p2.get("name", str(p2)) if isinstance(p2, dict) else str(p2)
+                        jugador_1 = p1.get("name") or p1.get("full_name") or p1.get("short_name") or str(p1)
+                        jugador_2 = p2.get("name") or p2.get("full_name") or p2.get("short_name") or str(p2)
                     else:
                         jugador_1 = "Jugador A"
                         jugador_2 = "Jugador B"
