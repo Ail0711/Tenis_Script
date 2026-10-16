@@ -72,10 +72,14 @@ with st.sidebar:
 
 
             if partidos_filtrados:
-                # Mostramos la estructura exacta del primer jugador para inspeccionarlo
                 primer_partido = partidos_filtrados[0]
                 players_prueba = primer_partido.get("players", [])
-                st.write("Estructura del primer player:", players_prueba[0] if players_prueba else "Vacío")
+                
+                # Inspección segura sin riesgo de que se ciegue la app
+                if players_prueba and isinstance(players_prueba, list):
+                    st.write("Estructura del primer player:", players_prueba[0])
+                else:
+                    st.warning("El primer partido no tiene elementos en la lista de 'players'.")
                 
                 for partido in partidos_filtrados[:10]:
                     players = partido.get("players", [])
