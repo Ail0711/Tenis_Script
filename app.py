@@ -72,14 +72,13 @@ with st.sidebar:
 
 
             if partidos_filtrados:
-                primer_partido = partidos_filtrados[0]
-                players_prueba = primer_partido.get("players", [])
+                # Buscamos el primer partido que SÍ tenga elementos en 'players' para inspeccionarlo
+                primer_con_jugadores = next((p for p in partidos_filtrados if p.get("players")), None)
                 
-                # Inspección segura sin riesgo de que se ciegue la app
-                if players_prueba and isinstance(players_prueba, list):
-                    st.write("Estructura del primer player:", players_prueba[0])
+                if primer_con_jugadores:
+                    st.write("Estructura de un player válido:", primer_con_jugadores.get("players")[0])
                 else:
-                    st.warning("El primer partido no tiene elementos en la lista de 'players'.")
+                    st.warning("Ninguno de los partidos filtrados tiene elementos en 'players'.")
                 
                 for partido in partidos_filtrados[:10]:
                     players = partido.get("players", [])
@@ -88,13 +87,17 @@ with st.sidebar:
                         p1 = players[0]
                         p2 = players[1]
                         
-                        jugador_1 = p1.get("name") or p1.get("full_name") or p1.get("short_name") or str(p1)
-                        jugador_2 = p2.get("name") or p2.get("full_name") or p2.get("short_name") or str(p2)
+                        # Probamos varias opciones comunes para la llave del nombre dentro del objeto del jugador
+                        jugador_1 = p1.get("name") or p1.get("full_name") or p1.get("short_name") or p1.get("player_name") or str(p1)
+                        jugador_2 = p2.get("name") or p2.get("full_name") or p2.get("short_name") or p2.get("player_name") or str(p2)
                     else:
-                        jugador_1 = "Jugador A"
-                        jugador_2 = "Jugador B"
+                        jugador_1 = "Partido por definir"
+                        jugador_2 = ""
                         
-                    st.markdown(f"• **{jugador_1}** vs **{jugador_2}**")
+                    if jugador_2:
+                        st.markdown(f"• **{jugador_1}** vs **{jugador_2}**")
+                    else:
+                        st.markdown(f"• {jugador_1}")
 
             else:
                 st.info(f"No hay partidos para el circuito seleccionado en este momento.")
