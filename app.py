@@ -56,17 +56,18 @@ with st.sidebar:
                 ejemplo_tour = lista_partidos[0].get('tour', 'No especificado')
                 st.caption(f"Ejemplo de tour: {ejemplo_tour}")
             
-            # Filtro estricto: Solo circuito principal (excluyendo Challengers e ITFs)
+            # Filtro estricto: Circuito principal (sin Challengers, sin ITFs y sin dobles)
             partidos_filtrados = []
             for p in lista_partidos:
                 tour_info = str(p.get("tour", "")).lower()
                 tier_info = str(p.get("tier", "")).lower()
+                is_doubles = p.get("is_doubles", False)
                 
-                # Descartamos todo lo que sea Challenger o ITF
-                if "challenger" in tour_info or "challenger" in tier_info or "itf" in tour_info or "itf" in tier_info:
+                # Descartamos dobles, Challengers e ITFs
+                if is_doubles or "challenger" in tour_info or "challenger" in tier_info or "itf" in tour_info or "itf" in tier_info:
                     continue
                 
-                # Seleccionamos solo los del circuito principal según la opción elegida
+                # Seleccionamos solo singles del circuito principal según la opción elegida
                 if is_atp:
                     if "atp" in tour_info or "atp" in tier_info or "grand_slam" in tier_info:
                         partidos_filtrados.append(p)
