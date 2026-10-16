@@ -56,16 +56,21 @@ with st.sidebar:
                 ejemplo_tour = lista_partidos[0].get('tour', 'No especificado')
                 st.caption(f"Ejemplo de tour: {ejemplo_tour}")
             
-            # Filtro flexible adaptado
+            # Filtro adaptado a las etiquetas reales que devuelve la API (en minúsculas)
             partidos_filtrados = []
             for p in lista_partidos:
-                tour_info = str(p.get("tour", "")).upper()
-                # Verificamos de forma más amplia según la selección
-                if is_atp and ("ATP" in tour_info or "MEN" in tour_info or "MALE" in tour_info):
-                    partidos_filtrados.append(p)
-                elif not is_atp and ("WTA" in tour_info or "WOMEN" in tour_info or "FEM" in tour_info):
-                    partidos_filtrados.append(p)
-            
+                tour_info = str(p.get("tour", "")).lower()
+                
+                if is_atp:
+                    # Incluye torneos ATP, Challengers y los ITF masculinos
+                    if "atp" in tour_info or "challenger" in tour_info or "itf" in tour_info:
+                        partidos_filtrados.append(p)
+                else:
+                    # Incluye torneos WTA y los ITF femeninos
+                    if "wta" in tour_info or "itf" in tour_info:
+                        partidos_filtrados.append(p)
+
+                        
             if partidos_filtrados:
                 for partido in partidos_filtrados[:10]:
                     jugador_1 = partido.get("player_1", "Jugador A")
@@ -80,7 +85,7 @@ with st.sidebar:
         st.write("Cargando cartelera de encuentros...")
 
 
-        
+
 # ==========================================
 # BLOQUE 1: USAR API EN VIVO
 # ==========================================
