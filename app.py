@@ -72,13 +72,8 @@ with st.sidebar:
 
 
             if partidos_filtrados:
-                # Buscamos el primer partido que SÍ tenga elementos en 'players' para inspeccionarlo
-                primer_con_jugadores = next((p for p in partidos_filtrados if p.get("players")), None)
-                
-                if primer_con_jugadores:
-                    st.write("Estructura de un player válido:", primer_con_jugadores.get("players")[0])
-                else:
-                    st.warning("Ninguno de los partidos filtrados tiene elementos en 'players'.")
+                # Imprimimos todo el contenido del primer partido para inspeccionar sus datos reales
+                st.write("Objeto completo del partido:", partidos_filtrados[0])
                 
                 for partido in partidos_filtrados[:10]:
                     players = partido.get("players", [])
@@ -86,18 +81,13 @@ with st.sidebar:
                     if isinstance(players, list) and len(players) >= 2:
                         p1 = players[0]
                         p2 = players[1]
-                        
-                        # Probamos varias opciones comunes para la llave del nombre dentro del objeto del jugador
-                        jugador_1 = p1.get("name") or p1.get("full_name") or p1.get("short_name") or p1.get("player_name") or str(p1)
-                        jugador_2 = p2.get("name") or p2.get("full_name") or p2.get("short_name") or p2.get("player_name") or str(p2)
-                    else:
-                        jugador_1 = "Partido por definir"
-                        jugador_2 = ""
-                        
-                    if jugador_2:
+                        jugador_1 = p1.get("name", str(p1)) if isinstance(p1, dict) else str(p1)
+                        jugador_2 = p2.get("name", str(p2)) if isinstance(p2, dict) else str(p2)
                         st.markdown(f"• **{jugador_1}** vs **{jugador_2}**")
                     else:
-                        st.markdown(f"• {jugador_1}")
+                        # Si la API no trae jugadores aún, mostramos el torneo o un aviso
+                        torneo = partido.get("tournament", "Torneo sin especificar")
+                        st.markdown(f"• *Por definir ({torneo})*")
 
             else:
                 st.info(f"No hay partidos para el circuito seleccionado en este momento.")
