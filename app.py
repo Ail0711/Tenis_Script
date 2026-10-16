@@ -72,14 +72,18 @@ with st.sidebar:
 
 
             if partidos_filtrados:
+                # Inspeccionamos la categoría (tier) del torneo en la API
+                primer_partido = partidos_filtrados[0]
+                tier_torneo = primer_partido.get("tier", "No especificado")
+                torneo_nombre = primer_partido.get("tournament", "No especificado")
+                
+                st.caption(f"Torneo de ejemplo: {torneo_nombre} | Tier: {tier_torneo}")
+                
                 for partido in partidos_filtrados[:10]:
                     players = partido.get("players", {})
-                    
-                    # Verificamos si 'players' es un diccionario con p1 y p2
                     if isinstance(players, dict):
                         p1 = players.get("p1", {})
                         p2 = players.get("p2", {})
-                        
                         jugador_1 = p1.get("name", "Jugador A") if isinstance(p1, dict) else "Jugador A"
                         jugador_2 = p2.get("name", "Jugador B") if isinstance(p2, dict) else "Jugador B"
                     else:
