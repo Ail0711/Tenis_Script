@@ -24,7 +24,7 @@ def obtener_partidos_api(api_key):
         return {}
 
 # Configuración de la página
-st.set_page_config(page_title="Modelo Cuantitativo Tenis Pro", page_icon="🎾", layout="centered")
+st.set_page_config(page_title="Script Cuantitativo Tenis Pro", page_icon="🎾", layout="centered")
 
 # ==========================================
 # GESTIÓN DE ESTADO
@@ -32,7 +32,7 @@ st.set_page_config(page_title="Modelo Cuantitativo Tenis Pro", page_icon="🎾",
 if 'modo_activo' not in st.session_state:
     st.session_state.modo_activo = "api"
 
-st.title("🎾 Modelo Matemático Analítico de Apuestas - Tenis")
+st.title("🎾 Script Matemático Analítico de Apuestas - Tenis")
 st.markdown("Herramienta analítica avanzada para el cálculo de *Dominance Ratio*, probabilidades, líneas justas y detección de valor (+EV).")
 
 st.write("")
@@ -322,7 +322,7 @@ if st.session_state.modo_activo == "api":
 # BLOQUE 2: INTRODUCIR DATOS MANUALMENTE
 # ==========================================
 else:
-    st.subheader("✍️ Auditoría Manual (Datos de Tennis Abstract)")
+    st.subheader("✍️ Analisis Manual (Datos de Tennis Abstract)")
     
     col_j1, col_j2 = st.columns(2)
     
