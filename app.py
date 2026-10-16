@@ -32,8 +32,7 @@ st.divider()
 API_KEY_DEF = st.secrets.get("LIVE_TENNIS_API_KEY", "")
 with st.sidebar:
     st.header("⚙️ Configuración General")
-    api_key_input = st.text_input("API Key de Live Tennis", value=API_KEY_DEF, type="password")
-    
+        
     # Añadimos on_change o permitimos que Streamlit detecte el cambio de circuito
     circuito = st.selectbox("Circuito Base", ["ATP (Masculino)", "WTA (Femenino)"], key="circuito_select")
     is_atp = "ATP" in circuito
@@ -58,7 +57,7 @@ if st.session_state.modo_activo == "api":
         if not jugador_buscado.strip():
             st.warning("⚠️ Por favor ingresa el nombre o apellido de un tenista.")
         else:
-            headers = {"x-api-key": api_key_input, "Content-Type": "application/json"}
+            headers = {"x-api-key": API_KEY_DEF, "Content-Type": "application/json"}
             url_partidos = "https://api.livetennisapi.com/api/public/v1/matches?status=upcoming"
             
             with st.spinner("Consultando la API y calculando métricas..."):
