@@ -72,22 +72,21 @@ with st.sidebar:
 
 
             if partidos_filtrados:
-                # Imprimimos todo el contenido del primer partido para inspeccionar sus datos reales
-                st.write("Objeto completo del partido:", partidos_filtrados[0])
-                
                 for partido in partidos_filtrados[:10]:
-                    players = partido.get("players", [])
+                    players = partido.get("players", {})
                     
-                    if isinstance(players, list) and len(players) >= 2:
-                        p1 = players[0]
-                        p2 = players[1]
-                        jugador_1 = p1.get("name", str(p1)) if isinstance(p1, dict) else str(p1)
-                        jugador_2 = p2.get("name", str(p2)) if isinstance(p2, dict) else str(p2)
-                        st.markdown(f"• **{jugador_1}** vs **{jugador_2}**")
+                    # Verificamos si 'players' es un diccionario con p1 y p2
+                    if isinstance(players, dict):
+                        p1 = players.get("p1", {})
+                        p2 = players.get("p2", {})
+                        
+                        jugador_1 = p1.get("name", "Jugador A") if isinstance(p1, dict) else "Jugador A"
+                        jugador_2 = p2.get("name", "Jugador B") if isinstance(p2, dict) else "Jugador B"
                     else:
-                        # Si la API no trae jugadores aún, mostramos el torneo o un aviso
-                        torneo = partido.get("tournament", "Torneo sin especificar")
-                        st.markdown(f"• *Por definir ({torneo})*")
+                        jugador_1 = "Jugador A"
+                        jugador_2 = "Jugador B"
+                        
+                    st.markdown(f"• **{jugador_1}** vs **{jugador_2}**")
 
             else:
                 st.info(f"No hay partidos para el circuito seleccionado en este momento.")
