@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+from datetime import datetime, timezone, timedelta
 
 # Configuración de la página
 st.set_page_config(page_title="Modelo Cuantitativo Tenis Pro", page_icon="🎾", layout="centered")
@@ -95,11 +96,19 @@ with st.sidebar:
                     court = partido.get("court", "")
                     raw_time = partido.get("scheduled_time", "")
                     
-                    # Recortamos la hora (HH:MM)
+                    # Convertimos la hora UTC de la API al horario de México (-6 horas)
                     hora_str = ""
-                    if raw_time and "T" in raw_time:
-                        hora_str = raw_time.split("T")[1][:5]
-                    
+                    if raw_time:
+                        try:
+                            dt_utc = datetime.fromisoformat(raw_time.replace("Z", "+00:00"))
+                            mexico_offset = timezone(timedelta(hours=-6))
+                            dt_mexico = dt_utc.astimezone(mexico_offset)
+                            hora_str = dt_mexico.strftime("%I:%M %p").lstrip("0").lower()
+                        except Exception:
+                            # Respaldo rápido por si el formato llega a variar
+                            if "T" in raw_time:
+                                hora_str = raw_time.split("T")[1][:5]
+
                     # Armamos el detalle con la superficie al frente para el análisis
                     detalles = []
                     if superficie:
