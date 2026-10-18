@@ -387,13 +387,13 @@ else:
         st.subheader("Auditoría contra Líneas del Casino (+EV)")
         st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
 
-            # 1. Selector manual para que TÚ decidas quién es el favorito del casino
+        # 1. Selector manual para elegir quién es el favorito del mercado
         favorito_casino = st.selectbox(
             "¿Quién es el favorito en el Casino?", 
             [jugador_1, jugador_2]
         )
 
-# Definimos quién sería el underdog automáticamente según tu selección
+# Definimos automáticamente quién es el otro (el underdog)
         underdog_casino = jugador_2 if favorito_casino == jugador_1 else jugador_1
 
         col_h1, col_h2, col_h3 = st.columns(3)
@@ -402,13 +402,13 @@ else:
             linea_casino_total = st.number_input("Línea Totales Casino (O/U)", value=21.5, min_value=0.0, max_value=50.0, step=0.5, format="%.1f")
 
         with col_h2:
-            # Hándicap para el que elegiste como favorito (por lo general negativo, ej. -1.5)
-            handicap_casino_fav = st.number_input(f"Hándicap ({favorito_casino} - Fav)", value=-0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
+            # La etiqueta ahora muestra dinámicamente el nombre de la jugadora elegida
+            handicap_casino_fav = st.number_input(f"Hándicap Casino ({favorito_casino})", value=-0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
 
         with col_h3:
-    # Hándicap para el underdog (por lo general positivo, ej. +1.5)
-            handicap_casino_dog = st.number_input(f"Hándicap ({underdog_casino} - Dog)", value=0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
-        
+        # La etiqueta muestra al underdog y acepta rango abierto
+            handicap_casino_dog = st.number_input(f"Hándicap Casino ({underdog_casino})", value=0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
+ 
         st.markdown("---")
         st.markdown("### 💡 Diagnóstico de Valor Estricto:")
         
