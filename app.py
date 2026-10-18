@@ -402,10 +402,10 @@ else:
 
         with col_h2:
             # Definimos la variable exacta que tus fórmulas de abajo están esperando
-            handicap_casino_fav = st.number_input("Hándicap Casino (Favorito)", value=-0.5, step=0.5, format="%.1f")
+            handicap_casino_fav = st.number_input("Hándicap Casino (Favorito)", value=0.0, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
         with col_h3:
             # Definimos la otra variable que usa el código de abajo
-             handicap_casino_dog = st.number_input("Hándicap Casino (Underdog)", value=0.5, step=0.5, format="%.1f")
+             handicap_casino_dog = st.number_input("Hándicap Casino (Underdog)", value=0.0, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
         
         st.markdown("---")
         st.markdown("### 💡 Diagnóstico de Valor Estricto:")
