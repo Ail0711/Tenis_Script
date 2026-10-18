@@ -384,28 +384,30 @@ else:
             st.metric(label=f"⚔️ {n2}", value=f"{prob_2}% Prob.", delta=f"DR: {dr_2}")
             
         st.divider()
-        st.subheader("📐 Proyecciones Matemáticas del Modelo")
-        mcol1, mcol2, mcol3 = st.columns(3)
-        mcol1.metric("Total Juegos Proyectados", f"{juegos_proyectados}", f"Línea Justa: {linea_totales_justa}")
-        mcol2.metric("Margen Proyectado", f"{margen_juegos_abs} juegos", f"A favor de {favorita}")
-        mcol3.metric("Favorito Teórico", favorita)
-        
-        st.divider()
         st.subheader("Auditoría contra Líneas del Casino (+EV)")
         st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
+
+            # 1. Selector manual para que TÚ decidas quién es el favorito del casino
+        favorito_casino = st.selectbox(
+            "¿Quién es el favorito en el Casino?", 
+            [jugador_1, jugador_2]
+        )
+
+# Definimos quién sería el underdog automáticamente según tu selección
+        underdog_casino = jugador_2 if favorito_casino == jugador_1 else jugador_1
 
         col_h1, col_h2, col_h3 = st.columns(3)
 
         with col_h1:
-            linea_casino_total = st.number_input("Línea Totales Casino (O/U)", value=21.5, step=0.5, format="%.1f")
+            linea_casino_total = st.number_input("Línea Totales Casino (O/U)", value=21.5, min_value=0.0, max_value=50.0, step=0.5, format="%.1f")
 
         with col_h2:
-            # Campo 1 totalmente libre (permite escribir positivo o negativo con el teclado o flechas)
-            handicap_p1 = st.number_input(f"Hándicap Casino ({jugador_1})", value=0.0, step=0.5, format="%.1f")
+            # Hándicap para el que elegiste como favorito (por lo general negativo, ej. -1.5)
+            handicap_casino_fav = st.number_input(f"Hándicap ({favorito_casino} - Fav)", value=-0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
 
         with col_h3:
-            # Campo 2 totalmente libre (permite escribir positivo o negativo con el teclado o flechas)
-            handicap_p2 = st.number_input(f"Hándicap Casino ({jugador_2})", value=0.0, step=0.5, format="%.1f")
+    # Hándicap para el underdog (por lo general positivo, ej. +1.5)
+            handicap_casino_dog = st.number_input(f"Hándicap ({underdog_casino} - Dog)", value=0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
         
         st.markdown("---")
         st.markdown("### 💡 Diagnóstico de Valor Estricto:")
