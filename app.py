@@ -395,17 +395,17 @@ else:
         st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
 
         col_h1, col_h2, col_h3 = st.columns(3)
-        
+
         with col_h1:
-        # Asegúrate de que se llame así:
-            linea_casino_total = st.number_input("Línea Totales Casino (O/U)", value=21.5, step=0.5)
+            linea_casino_total = st.number_input("Línea Totales Casino (O/U)", value=21.5, step=0.5, format="%.1f")
 
         with col_h2:
-            # Definimos la variable exacta que tus fórmulas de abajo están esperando
-            handicap_casino_fav = st.number_input("Hándicap Casino (Favorito)", value=0.0, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
+            # Campo 1 totalmente libre (permite escribir positivo o negativo con el teclado o flechas)
+            handicap_p1 = st.number_input(f"Hándicap Casino ({jugador_1})", value=0.0, step=0.5, format="%.1f")
+
         with col_h3:
-            # Definimos la otra variable que usa el código de abajo
-             handicap_casino_dog = st.number_input("Hándicap Casino (Underdog)", value=0.0, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
+            # Campo 2 totalmente libre (permite escribir positivo o negativo con el teclado o flechas)
+            handicap_p2 = st.number_input(f"Hándicap Casino ({jugador_2})", value=0.0, step=0.5, format="%.1f")
         
         st.markdown("---")
         st.markdown("### 💡 Diagnóstico de Valor Estricto:")
