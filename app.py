@@ -391,16 +391,21 @@ else:
         mcol3.metric("Favorito Teórico", favorita)
         
         st.divider()
-        st.subheader("🎰 Auditoría contra Líneas del Casino (+EV)")
+        st.subheader("Auditoría contra Líneas del Casino (+EV)")
         st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
-        
-        ccol1, ccol2, ccol3 = st.columns(3)
-        with ccol1:
-            linea_casino_total = st.number_input("Línea Totales Casino (O/U)", min_value=12.5, max_value=45.5, value=float(linea_totales_justa), step=0.5, key="c_tot_man")
-        with ccol2:
-            handicap_casino_fav = st.number_input(f"Hándicap Casino ({favorita})", min_value=-15.0, max_value=0.0, value=-3.5, step=0.5, key="c_fav_man")
-        with ccol3:
-            handicap_casino_dog = st.number_input(f"Hándicap Casino ({underdog})", min_value=0.0, max_value=15.0, value=3.5, step=0.5, key="c_dog_man")
+
+        col_h1, col_h2, col_h3 = st.columns(3)
+        col_h2, col_h3 = st.columns(2)
+        with col_h1:
+        # Asegúrate de que se llame así:
+            linea_casino_total = st.number_input("Línea Totales Casino (O/U)", value=21.5, step=0.5)
+
+        with col_h2:
+            # Definimos la variable exacta que tus fórmulas de abajo están esperando
+            handicap_casino_fav = st.number_input("Hándicap Casino (Favorito)", value=-0.5, step=0.5, format="%.1f")
+        with col_h3:
+            # Definimos la otra variable que usa el código de abajo
+             handicap_casino_dog = st.number_input("Hándicap Casino (Underdog)", value=0.5, step=0.5, format="%.1f")
         
         st.markdown("---")
         st.markdown("### 💡 Diagnóstico de Valor Estricto:")
