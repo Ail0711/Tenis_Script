@@ -395,7 +395,7 @@ else:
         st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
 
         col_h1, col_h2, col_h3 = st.columns(3)
-        col_h2, col_h3 = st.columns(2)
+        
         with col_h1:
         # Asegúrate de que se llame así:
             linea_casino_total = st.number_input("Línea Totales Casino (O/U)", value=21.5, step=0.5)
