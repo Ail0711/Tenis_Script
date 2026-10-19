@@ -382,8 +382,8 @@ else:
             st.metric(label=f"⚔️ {n2}", value=f"{prob_2}% Prob.", delta=f"DR: {dr_2}")
 
 
-            st.markdown("### 📐 Proyecciones Matemáticas del Modelo")
-            col_m1, col_m2, col_m3 = st.columns(3)
+        st.markdown("### 📐 Proyecciones Matemáticas del Modelo")
+        col_m1, col_m2, col_m3 = st.columns(3)
 
         with col_m1:
          st.metric("Total Juegos Proyectados", f"{juegos_proyectados:.1f}", f"Línea Justa: {linea_justa}")
