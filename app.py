@@ -2,24 +2,6 @@ import streamlit as st
 import requests
 from datetime import datetime, timezone, timedelta
 
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-from datetime import datetime
-import pandas as pd
-
-# Configuración de la conexión a Google Sheets
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-
-try:
-    # Intenta conectar usando tu archivo de credenciales
-    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
-    client = gspread.authorize(creds)
-    sheet = client.open("Auditoria_Apuestas_Valor_Cloud").sheet1
-    conexion_valida = True
-except Exception as e:
-    conexion_valida = False
-    # Si no encuentra el archivo o falla la red, la app no se rompe
-
 # ==========================================
 # FUNCIÓN DE CACHÉ (Pégalo arriba de todo)
 # ==========================================
@@ -458,29 +440,3 @@ else:
             st.success(f"🐕 **¡Valor Masivo en el Underdog!**: El casino te regala un hándicap de `+{handicap_casino_dog}`, superando la diferencia real proyectada de `+{margen_juegos_abs}`. ¡Excelente oportunidad (+EV)!")
         else:
             st.info(f"🛡️ **Sin valor claro en el Underdog**: El hándicap `+{handicap_casino_dog}` del casino no ofrece suficiente margen frente a la proyección.")
-
-#2. FUERA de los if/else anteriores (al nivel principal de la página), 
-# definimos las variables de registro para que existan siempre:
-val_totales = f"Línea Justa: {linea_totales_justa} vs Casino: {linea_casino_total}"
-val_over = "Sí (Over Detectado)" if linea_casino_total < linea_totales_justa - 1.5 else "No"
-val_under = "Sí (Under Detectado)" if linea_casino_total > linea_totales_justa + 1.5 else "No"
-
-st.subheader("📋 Registro de Apuestas (+EV)")
-
-# 3. El botón para registrar en la nube
-if st.button("☁️ Enviar Apuesta a Google Sheets"):
-    fila_nueva = [
-        datetime.now().strftime("%Y-%m-%d"),
-        f"{n1} vs {n2}",
-        float(round(margen_juegos_abs, 1)),
-        float(round(juegos_proyectados, 1)),
-        val_totales,
-        val_over,
-        val_under
-    ]
-    
-    if conexion_valida:
-        sheet.append_row(fila_nueva)
-        st.success("¡Apuesta registrada y sincronizada en tu Google Sheet de la nube con éxito! 🚀")
-    else:
-        st.warning("Se guardó en memoria local (configura credentials.json).")    
