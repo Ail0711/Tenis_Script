@@ -459,16 +459,17 @@ else:
         else:
             st.info(f"🛡️ **Sin valor claro en el Underdog**: El hándicap `+{handicap_casino_dog}` del casino no ofrece suficiente margen frente a la proyección.")
 
-    st.subheader("📋 Registro de Apuestas (+EV)")
+#2. FUERA de los if/else anteriores (al nivel principal de la página), 
+# definimos las variables de registro para que existan siempre:
+val_totales = f"Línea Justa: {linea_totales_justa} vs Casino: {linea_casino_total}"
+val_over = "Sí (Over Detectado)" if linea_casino_total < linea_totales_justa - 1.5 else "No"
+val_under = "Sí (Under Detectado)" if linea_casino_total > linea_totales_justa + 1.5 else "No"
 
-        # Definimos las variables de los valores actuales del análisis
-    val_totales = f"Línea Justa: {linea_totales_justa} vs Casino: {linea_casino_total}"
-    val_over = "Sí (Over Detectado)" if linea_casino_total < linea_totales_justa - 1.5 else "No"
-    val_under = "Sí (Under Detectado)" if linea_casino_total > linea_totales_justa + 1.5 else "No"
+st.subheader("📋 Registro de Apuestas (+EV)")
 
-    # Botón para registrar
-    if st.button("☁️ Enviar Apuesta a Google Sheets"):
-        fila_nueva = [
+# 3. El botón para registrar en la nube
+if st.button("☁️ Enviar Apuesta a Google Sheets"):
+    fila_nueva = [
         datetime.now().strftime("%Y-%m-%d"),
         f"{n1} vs {n2}",
         float(round(margen_juegos_abs, 1)),
@@ -478,20 +479,8 @@ else:
         val_under
     ]
     
-        if conexion_valida:
-        # Inserta la fila automáticamente al final de tu Google Sheet en la nube
-            sheet.append_row(fila_nueva)
-            st.success("¡Apuesta registrada y sincronizada en tu Google Sheet de la nube con éxito! 🚀")
-        else:
-        # Respaldo en sesión local si la API no está configurada aún
-            st.session_state["historial_apuestas"].append(fila_nueva)
-            st.warning("Se guardó en memoria local (configura credenciales.json para enlace en vivo con Google Sheets).")
-
-    # Visualización rápida del archivo en la nube
-        if st.button("🔄 Ver registros actuales en la nube"):
-            if conexion_valida:
-                data_nube = sheet.get_all_records()
-                if data_nube:
-                    st.dataframe(pd.DataFrame(data_nube), use_container_width=True)
-                else:
-                    st.info("La hoja en la nube está vacía actualmente.")
+    if conexion_valida:
+        sheet.append_row(fila_nueva)
+        st.success("¡Apuesta registrada y sincronizada en tu Google Sheet de la nube con éxito! 🚀")
+    else:
+        st.warning("Se guardó en memoria local (configura credentials.json).")    
