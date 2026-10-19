@@ -1,2 +1,5 @@
 streamlit
-requests
+pandas
+openpyxl
+gspread
+oauth2client
