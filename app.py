@@ -400,21 +400,7 @@ else:
     # Hándicap para el underdog calculado por tu modelo matemático
             handicap_casino_dog = st.number_input("Hándicap Casino (Underdog Modelo)", value=0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
             
-            st.divider()
-            st.subheader("Auditoría contra Líneas del Casino (+EV)")
-            st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
-
-            col_h1, col_h2, col_h3 = st.columns(3)
-
-        with col_h1:
-            linea_casino_total = st.number_input("Línea Totales Casino (O/U)", value=21.5, min_value=0.0, max_value=50.0, step=0.5, format="%.1f")
-
-        with col_h2:
-    # Hándicap para el favorito calculado por tu modelo matemático
-            handicap_casino_fav = st.number_input("Hándicap Casino (Favorito Modelo)", value=-0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
-
-        with col_h3:
-    # Hándicap para el underdog calculado por tu modelo matemático
+          
             handicap_casino_dog = st.number_input("Hándicap Casino (Underdog Modelo)", value=0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
         st.markdown("---")
         st.markdown("### 💡 Diagnóstico de Valor Estricto:")
