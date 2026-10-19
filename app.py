@@ -478,20 +478,20 @@ else:
         val_under
     ]
     
-    if conexion_valida:
+        if conexion_valida:
         # Inserta la fila automáticamente al final de tu Google Sheet en la nube
-        sheet.append_row(fila_nueva)
-        st.success("¡Apuesta registrada y sincronizada en tu Google Sheet de la nube con éxito! 🚀")
-    else:
+            sheet.append_row(fila_nueva)
+            st.success("¡Apuesta registrada y sincronizada en tu Google Sheet de la nube con éxito! 🚀")
+        else:
         # Respaldo en sesión local si la API no está configurada aún
-        st.session_state["historial_apuestas"].append(fila_nueva)
-        st.warning("Se guardó en memoria local (configura credenciales.json para enlace en vivo con Google Sheets).")
+            st.session_state["historial_apuestas"].append(fila_nueva)
+            st.warning("Se guardó en memoria local (configura credenciales.json para enlace en vivo con Google Sheets).")
 
     # Visualización rápida del archivo en la nube
-    if st.button("🔄 Ver registros actuales en la nube"):
-        if conexion_valida:
-            data_nube = sheet.get_all_records()
-            if data_nube:
-                st.dataframe(pd.DataFrame(data_nube), use_container_width=True)
-            else:
-                st.info("La hoja en la nube está vacía actualmente.")
+        if st.button("🔄 Ver registros actuales en la nube"):
+            if conexion_valida:
+                data_nube = sheet.get_all_records()
+                if data_nube:
+                    st.dataframe(pd.DataFrame(data_nube), use_container_width=True)
+                else:
+                    st.info("La hoja en la nube está vacía actualmente.")
