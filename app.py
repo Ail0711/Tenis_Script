@@ -400,7 +400,28 @@ else:
     # Hándicap para el underdog calculado por tu modelo matemático
             handicap_casino_dog = st.number_input("Hándicap Casino (Underdog Modelo)", value=0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
 
-            
+        # ==========================================
+        # AQUÍ DEBEN DE IR LAS PROYECCIONES MATEMÁTICAS
+        # ==========================================
+        st.markdown("### 📐 Proyecciones Matemáticas del Modelo")
+        col_m1, col_m2, col_m3 = st.columns(3)
+
+        with col_m1:
+            st.metric("Total Juegos Proyectados", f"{juegos_proyectados:.1f}", f"Línea Justa: {linea_justa}")
+
+        with col_m2:
+            st.metric("Margen Proyectado", f"{margen_proyectado:.1f} juegos", f"A favor de {favorito_modelo}")
+
+        with col_m3:
+            st.metric("Favorito Teórico", favorito_modelo)
+
+            st.divider()
+
+# ==========================================
+# Y AQUÍ ABAJO SIGUE TU AUDITORÍA DEL CASINO
+# ==========================================
+            st.subheader("Auditoría contra Líneas del Casino (+EV)")
+# ... (tus st.number_input con los hándicaps y las keys únicas) 
         st.markdown("---")
         st.markdown("### 💡 Diagnóstico de Valor Estricto:")
         
