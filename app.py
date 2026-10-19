@@ -399,9 +399,8 @@ else:
         with col_h3:
     # Hándicap para el underdog calculado por tu modelo matemático
             handicap_casino_dog = st.number_input("Hándicap Casino (Underdog Modelo)", value=0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
+
             
-          
-            handicap_casino_dog = st.number_input("Hándicap Casino (Underdog Modelo)", value=0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
         st.markdown("---")
         st.markdown("### 💡 Diagnóstico de Valor Estricto:")
         
