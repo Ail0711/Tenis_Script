@@ -415,7 +415,7 @@ else:
 # ==========================================
 # Y AQUÍ ABAJO SIGUE TU AUDITORÍA DEL CASINO
 # ==========================================
-            st.subheader("Auditoría contra Líneas del Casino (+EV)")
+        st.subheader("Auditoría contra Líneas del Casino (+EV)")
 # ... (tus st.number_input con los hándicaps y las keys únicas) 
         st.markdown("---")
         st.markdown("### 💡 Diagnóstico de Valor Estricto:")
