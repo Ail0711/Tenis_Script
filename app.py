@@ -435,7 +435,8 @@ else:
 
         # Evaluamos el hándicap del Underdog del Modelo
         # Si el casino le da un hándicap menor (más bajo o negativo) al esperado (+margen_juegos_abs), te está dando una ventaja tremenda.
-        if handicap_casino_dog < (margen_juegos_abs - 1.5):
-            st.success(f"🐕 **¡Valor Masivo en el Underdog ({underdog})!**: El casino ofrece un hándicap de `{handicap_casino_dog}`, superando con creces la expectativa de diferencia real (`+{margen_juegos_abs}`). ¡Excelente oportunidad (+EV)!")
+        # Evaluamos si el hándicap del casino supera el margen del modelo con un margen de seguridad razonable (+ 0.5)
+        if handicap_casino_dog > (margen_juegos_abs + 0.5):
+            st.success(f"🐕 **¡Valor Masivo en el Underdog!**: El casino te regala un hándicap de `+{handicap_casino_dog}`, superando la diferencia real proyectada de `+{margen_juegos_abs}`. ¡Excelente oportunidad (+EV)!")
         else:
-            st.info(f"🛡️ **Sin valor claro en el Underdog**: El hándicap `{handicap_casino_dog}` del casino no ofrece suficiente margen frente a la proyección.")
+            st.info(f"🛡️ **Sin valor claro en el Underdog**: El hándicap `+{handicap_casino_dog}` del casino no ofrece suficiente margen frente a la proyección.")
