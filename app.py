@@ -76,15 +76,6 @@ with st.sidebar:
             ejemplo_tour = lista_partidos[0].get('tour', 'No especificado')
             st.caption(f"Ejemplo de tour: {ejemplo_tour}")
 
-
-            # --- LÍNEA DE DIAGNÓSTICO TEMPORAL ---
-            # Esto te mostrará en la app cuántos partidos totales trajo la API y un ejemplo del circuito
-            if lista_partidos:
-                st.caption(f"Total partidos en API: {len(lista_partidos)}")
-                # Mostramos de ejemplo cómo viene el torneo del primer partido
-                ejemplo_tour = lista_partidos[0].get('tour', 'No especificado')
-                st.caption(f"Ejemplo de tour: {ejemplo_tour}")
-            
             # Filtro estricto: Circuito principal (sin Challengers, sin ITFs y sin dobles)
             partidos_filtrados = []
             for p in lista_partidos:
@@ -374,7 +365,14 @@ else:
         
         favorita = n1 if diff_dr >= 0 else n2
         underdog = n2 if diff_dr >= 0 else n1
-        
+
+
+        # Variables limpias que ya existen en tu script
+        linea_justa = linea_totales_justa
+        margen_proyectado = margen_juegos_abs
+        favorito_modelo = favorita
+        # Declaramos las variables que faltan para que el modelo las lea sin errores
+
         st.success("📊 **Resultados del Análisis Manual:**")
         
         col_r1, col_r2 = st.columns(2)
@@ -382,7 +380,21 @@ else:
             st.metric(label=f"⚔️ {n1}", value=f"{prob_1}% Prob.", delta=f"DR: {dr_1}")
         with col_r2:
             st.metric(label=f"⚔️ {n2}", value=f"{prob_2}% Prob.", delta=f"DR: {dr_2}")
-            
+
+
+            st.markdown("### 📐 Proyecciones Matemáticas del Modelo")
+            col_m1, col_m2, col_m3 = st.columns(3)
+
+        with col_m1:
+         st.metric("Total Juegos Proyectados", f"{juegos_proyectados:.1f}", f"Línea Justa: {linea_justa}")
+
+        with col_m2:
+            st.metric("Margen Proyectado", f"{margen_proyectado:.1f} juegos", f"A favor de {favorito_modelo}")
+
+        with col_m3:
+            st.metric("Favorito Teórico", favorito_modelo)
+
+        st.divider()
         st.divider()
         st.subheader("Auditoría contra Líneas del Casino (+EV)")
         st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
@@ -400,22 +412,6 @@ else:
     # Hándicap para el underdog calculado por tu modelo matemático
             handicap_casino_dog = st.number_input("Hándicap Casino (Underdog Modelo)", value=0.5, min_value=-15.0, max_value=15.0, step=0.5, format="%.1f")
 
-        # ==========================================
-        # AQUÍ DEBEN DE IR LAS PROYECCIONES MATEMÁTICAS
-        # ==========================================
-        st.markdown("### 📐 Proyecciones Matemáticas del Modelo")
-        col_m1, col_m2, col_m3 = st.columns(3)
-
-        with col_m1:
-            st.metric("Total Juegos Proyectados", f"{juegos_proyectados:.1f}", f"Línea Justa: {linea_justa}")
-
-        with col_m2:
-            st.metric("Margen Proyectado", f"{margen_proyectado:.1f} juegos", f"A favor de {favorito_modelo}")
-
-        with col_m3:
-            st.metric("Favorito Teórico", favorito_modelo)
-
-            st.divider()
 
 # ==========================================
 # Y AQUÍ ABAJO SIGUE TU AUDITORÍA DEL CASINO
