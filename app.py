@@ -426,12 +426,16 @@ else:
         else:
             st.info(f"⚖️ **Totales sin valor claro:** La línea del casino ({linea_casino_total}) está alineada con la justa del modelo ({linea_totales_justa}).")
             
-        if abs(handicap_casino_fav) < (margen_juegos_abs - 1.5):
-            st.success(f"🔥 **Valor en el Favorito ({favorita}):** El casino te pide cubrir un hándicap de solo `{handicap_casino_fav}`, pero tu modelo espera un margen de `-{margen_juegos_abs}`. ¡Hay ventaja a favor del favorito!")
+        # Evaluamos el hándicap del Favorito del Modelo
+        # Si el casino le da un hándicap mayor (más positivo o menos negativo) al margen proyectado (-margen_juegos_abs), hay valor.
+        if handicap_casino_fav > (-margen_juegos_abs + 1.5):
+            st.success(f"🔥 **¡Valor Masivo en el Favorito ({favorita})!**: El casino ofrece un hándicap de `{handicap_casino_fav}`, que es mucho más generoso que el margen ajustado de `-{margen_juegos_abs}` proyectado por tu modelo.")
         else:
-            st.info(f"🛡️ **Sin valor claro en el Favorito:** El hándicap del casino (`{handicap_casino_fav}`) es demasiado alto para el margen proyectado.")
+            st.info(f"🛡️ **Sin valor claro en el Favorito**: El hándicap del casino (`{handicap_casino_fav}`) es demasiado ajustado para el margen esperado.")
 
-        if handicap_casino_dog > (margen_juegos_abs + 1.5):
-            st.success(f"🐕 **Valor Real en el Underdog ({underdog}):** El casino te está regalando un hándicap de `+{handicap_casino_dog}`, cuando tu modelo proyecta que la diferencia real será menor (`{margen_juegos_abs}`). ¡Excelente valor en el underdog!")
+        # Evaluamos el hándicap del Underdog del Modelo
+        # Si el casino le da un hándicap menor (más bajo o negativo) al esperado (+margen_juegos_abs), te está dando una ventaja tremenda.
+        if handicap_casino_dog < (margen_juegos_abs - 1.5):
+            st.success(f"🐕 **¡Valor Masivo en el Underdog ({underdog})!**: El casino ofrece un hándicap de `{handicap_casino_dog}`, superando con creces la expectativa de diferencia real (`+{margen_juegos_abs}`). ¡Excelente oportunidad (+EV)!")
         else:
-            st.info(f"🛡️ **Sin valor claro en el Underdog:** El hándicap `+{handicap_casino_dog}` del casino es ajustado y no supera con margen el hándicap real esperado.")
+            st.info(f"🛡️ **Sin valor claro en el Underdog**: El hándicap `{handicap_casino_dog}` del casino no ofrece suficiente margen frente a la proyección.")
