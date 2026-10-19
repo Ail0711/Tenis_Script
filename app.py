@@ -395,7 +395,6 @@ else:
             st.metric("Favorito Teórico", favorito_modelo)
 
         st.divider()
-        st.divider()
         st.subheader("Auditoría contra Líneas del Casino (+EV)")
         st.markdown("Ingresa las líneas reales que publica tu casa de apuestas:")
 
